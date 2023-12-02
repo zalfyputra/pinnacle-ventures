@@ -17,37 +17,54 @@ if (isset($_GET['action']) && $_GET['action'] == 'logout') {
     exit();
 }
 
-// Cek jika form login disubmit
+// Mulai sesi
+session_name('session_id');
+// Mulai sesi
+session_start();
+
+// Jika metode request adalah POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = mysqli_real_escape_string($koneksi, $_POST['username']);
-    $password = md5($_POST['password']); // Password di-hash dengan MD5
+ $username = mysqli_real_escape_string($koneksi, $_POST['username']);
+ $password = md5($_POST['password']); // Password di-hash dengan MD5
 
-    // Cek apakah username ada di tabel admins
-    $queryAdmin = "SELECT * FROM admins WHERE username = '$username' AND password = '$password'";
-    $resultAdmin = mysqli_query($koneksi, $queryAdmin);
-    if (mysqli_num_rows($resultAdmin) == 1) {
-        // Jika user adalah admin
-        $cookieData = serialize(array('username' => $username, 'is_admin' => 1));
+ // Cek apakah username ada di tabel admins
+ $queryAdmin = "SELECT * FROM admins WHERE username = '$username' AND password = '$password'";
+ $resultAdmin = mysqli_query($koneksi, $queryAdmin);
+ if (mysqli_num_rows($resultAdmin) == 1) {
+    // Jika user adalah admin
+    $cookieData = serialize(array('username' => $username, 'is_admin' => 1));
+ } else {
+    // Cek apakah username ada di tabel users
+    $queryUser = "SELECT * FROM users WHERE username = '$username' AND password = '$password'";
+    $resultUser = mysqli_query($koneksi, $queryUser);
+    if (mysqli_num_rows($resultUser) == 1) {
+        // Jika user bukan admin
+        $cookieData = serialize(array('username' => $username, 'is_admin' => 0));
     } else {
-        // Cek apakah username ada di tabel users
-        $queryUser = "SELECT * FROM users WHERE username = '$username' AND password = '$password'";
-        $resultUser = mysqli_query($koneksi, $queryUser);
-        if (mysqli_num_rows($resultUser) == 1) {
-            // Jika user bukan admin
-            $cookieData = serialize(array('username' => $username, 'is_admin' => 0));
-        } else {
-            // Jika login gagal
-            echo 'Username atau password salah!';
-            exit();
-        }
+        // Jika login gagal
+        echo 'Username atau password salah!';
+        exit();
     }
+ }
 
-    // Set cookie
-    $encodedCookieData = base64_encode($cookieData); // Mengenkripsi data dengan Base64
-    setcookie('login', $encodedCookieData, time() + (86400 * 30), "/"); // Cookie akan bertahan selama 30 hari
-    header('Location: index.php'); // Redirect ke halaman index
-    exit();
+ // Increment session ID
+ if (!isset($_SESSION['login_count'])) {
+    $_SESSION['login_count'] = 0;
+ } else {
+    $_SESSION['login_count']++;
+ }
+
+ $session_id = $_SESSION['login_count'];
+ session_id($session_id); // Set session ID
+ setcookie("session_id", $session_id, time() + (86400 * 30), "/");
+
+ // Set cookie
+ $encodedCookieData = base64_encode($cookieData); // Mengenkripsi data dengan Base64
+ setcookie('login', $encodedCookieData, time() + (86400 * 30), "/"); // Cookie akan bertahan selama 30 hari
+ header('Location: index.php'); // Redirect ke halaman index
+ exit();
 }
+
 ?>
 
 <!DOCTYPE html>
