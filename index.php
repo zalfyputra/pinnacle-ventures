@@ -1,5 +1,4 @@
 <?php
-// Cek jika user sudah login (berdasarkan keberadaan cookie)
 $loggedIn = isset($_COOKIE['login']);
 
 // Logika untuk logout
@@ -12,100 +11,70 @@ if (isset($_GET['action']) && $_GET['action'] == 'logout') {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to Pinnacle Ventures!</title>
+    <title>Welcome to KemjarA13!</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Urbanist:ital,wght@0,600;0,700;0,800;1,600;1,700;1,800&display=swap');
+
         body {
-            background-image: url('img/bg-3.jpg');
+            background-color: #2b3035;
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
-            color: #FFFFFF; /* Set text color to white */
-            font-family: 'Poppins', sans-serif; /* Custom Font */
-        }
-        .card {
-            background-color: #000000;
-        }
-
-        .btn-primary {
-            background-color: #C852E2;
-            border-color: #C852E2;
-        }
-
-        h3{
-            font-family: 'Urbanist', sans-serif;
-            color: white
+            color: #FFFFFF;
+            /* Set text color to white */
+            font-family: 'Poppins', sans-serif;
+            /* Custom Font */
         }
 
         .btn-primary:hover {
-            background-color: #DA007C;
-            border-color: #DA007C;
+            background-color: #003d80;
+            border-color: #003d80;
         }
 
-        /* Custom class for centered text in card */
-        .card-title-center, .card-text-center {
+        .card-title-center,
+        .card-text-center {
             text-align: center;
         }
     </style>
 </head>
+
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <a class="navbar-brand" href="index.php"><h3>Pinnacle Ventures</h3></a>
-        <div class="collapse navbar-collapse">
-            <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" style="color: #FFFFFF; font-size:20px;"  href="about.php">About</a>
-                    </li>
+    <nav class="navbar navbar-expand">
+        <div class="container-fluid">
+            <div class="navbar-collapse d-flex">
+                <a class="navbar-brand col-3 me-0 font-weight-bold" style="font-size: 24px;" href="index.php">Kemjar A13</a>
+                <ul class="navbar-nav col-6 justify-content-center">
+                    <?php if ($loggedIn): ?>
+                        <li class="nav-item">
+                            <a class="nav-link active" style="font-size: 24px;" href="about.php">About</a>
+                        </li>
+                    <?php endif; ?>
+                </ul>
                 <?php if ($loggedIn): ?>
-                    <li class="nav-item">
-                        <a class="nav-link" style="color: #FFFFFF; font-size:20px;"  href="profile.php">Profile</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" style="color: #FFFFFF; font-size:20px;"  href="?action=logout">Logout</a>
-                    </li>
+                    <div class="d-flex col-3 justify-content-end">
+                        <a class="btn btn-primary" href="?action=logout">Logout</a>
+                    </div>
                 <?php else: ?>
-                    <li class="nav-item">
-                        <a class="nav-link" style="color: #FFFFFF; font-size:20px;"  href="login.php">Login</a>
-                    </li>
+                    <div class="d-flex col-3 justify-content-end">
+                        <a class="btn btn-primary" href="login.php">Login</a>
+                    </div>
                 <?php endif; ?>
-            </ul>
+            </div>
         </div>
     </nav>
 
-    <div class="container mt-5" style="padding-top:20%">
-        <p class="text-center mb-4 ">Embark on Your Mystical Journey!</p>
-        <p class="text-center" style="font-size:20px">Dive into our collection and find the potion that resonates with your soul. Whether for collection, display, or to simply bask in their enigmatic presence, PoisonPantry.com is your portal to a world of arcane wonder.</p>
-        <div class="row" style="padding-top:35px">
-            <?php
-            require_once 'config.php';
+    <div class="w-100 d-flex mt-5 px-auto">
+        <img src="img/hackedComputer.gif" alt="" width="350" class="rounded-circle align-self-center mx-auto" />
+    </div>
+    <div class="container mt-5">
 
-            $query = "SELECT * FROM poisons";
-            $result = mysqli_query($koneksi, $query);
-
-            while ($product = mysqli_fetch_assoc($result)) {
-                echo '<div class="col-md-3 d-flex align-items-stretch mb-4">'; // Menggunakan 'd-flex align-items-stretch'
-                echo '<div class="card" style="background-color: #000000;">'; // Kartu produk
-                // Pastikan semua gambar memiliki ukuran yang sama atau kelas yang membuatnya responsif
-                echo '<img class="card-img-top" src="img/' . $product['name'] . '.jpg" alt="' . htmlspecialchars($product['name']) . '" style="width: 100%; height: auto;">';
-                echo '<div class="card-body d-flex flex-column">'; // Menggunakan 'd-flex flex-column'
-                echo '<h5 class="card-title-center">' . htmlspecialchars($product['name']) . '</h5>';
-                echo '<p class="card-text-center">Price: ' . htmlspecialchars($product['pricess']) . '</p>';
-              if ($loggedIn): 
-                    echo '<a href="buy.php?id=' . $product['id'] . '" class="btn btn-primary mt-auto">Buy</a>';
-              else:
-                    echo '<button onclick="loginAlert()" class="btn btn-primary mt-auto">Buy</button>';
-              endif; 
-                
-                echo '</div>';
-                echo '</div>';
-                echo '</div>';
-            }
-            ?>
-        </div>
+        <p class="text-center" style="font-size: 35px;">Ready to be hacked?</p>
+        <p class="text-center mb-4 ">- Albert & Zalfy -</p>
     </div>
 
     <!-- Bootstrap JS, Popper.js, and jQuery -->
@@ -125,4 +94,5 @@ if (isset($_GET['action']) && $_GET['action'] == 'logout') {
         }
     </script>
 </body>
+
 </html>

@@ -22,14 +22,13 @@ Download and install XAMPP from the official website: [XAMPP](https://www.apache
 
 - Open a web browser.
 - Go to `http://localhost/phpmyadmin/`.
-- Log in with the default credentials (username: `root`, password: blank).
 
 ### 4. Create Database
 
 - Click on the "Databases" tab in phpMyAdmin.
-- Create a new database with an appropriate name for your project.
+- Create a new database called "KemjarA13".
 
-### 5. Import Database (if needed)
+### 5. Import Database 
 
 If your project includes a database dump:
 
