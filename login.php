@@ -2,12 +2,9 @@
 // Sertakan file konfigurasi database
 require_once 'config.php';
 
-// Mulai sesi
-session_name('session_id');
-session_start();
 
 // Cek jika user sudah login (berdasarkan keberadaan session)
-$loggedIn = isset($_COOKIE['login']);
+$loggedIn = isset($_COOKIE['PHPSESSID']);
 
 if ($loggedIn) {
     header('Location: index.php'); // Redirect kembali ke index.php
@@ -16,48 +13,46 @@ if ($loggedIn) {
 
 // Logika untuk logout
 if (isset($_GET['action']) && $_GET['action'] == 'logout') {
-    session_destroy(); // Menghapus session
-    header('Location: index.php'); // Redirect kembali ke index.php
-    exit();
+   if (isset($_SERVER['HTTP_COOKIE'])) {
+       $cookies = explode(';', $_SERVER['HTTP_COOKIE']);
+       foreach($cookies as $cookie) {
+           $parts = explode('=', $cookie);
+           $name = trim($parts[0]);
+           setcookie($name, '', time()-1000);
+           setcookie($name, '', time()-1000, '/');
+       }
+   }
+   header('Location: login.php'); // Redirect ke login.php
+   exit();
 }
 
 // Jika metode request adalah POST
+// Jika metode request adalah POST
+// Jika metode request adalah POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = mysqli_real_escape_string($koneksi, $_POST['username']);
-    $password = md5($_POST['password']); // Password di-hash dengan MD5
+ $username = mysqli_real_escape_string($koneksi, $_POST['username']);
+ $password = md5($_POST['password']); // Password di-hash dengan MD5
 
-    // Cek apakah username ada di tabel users
-    $queryUser = "SELECT * FROM users WHERE username = '$username' AND password = '$password'";
-    $resultUser = mysqli_query($koneksi, $queryUser);
+ // Cek apakah username ada di tabel users
+ $queryUser = "SELECT * FROM users WHERE username = '$username' AND password = '$password'";
+ $resultUser = mysqli_query($koneksi, $queryUser);
 
-    if (mysqli_num_rows($resultUser) == 1) {
-        // Jika user bukan admin
-        $cookieData = serialize(array('username' => $username));
-    } else {
-        // Jika login gagal
-        echo 'Username atau password salah!';
-        exit();
-    }
+ if (mysqli_num_rows($resultUser) == 1) {
+   // Mulai sesi
+   session_start();
+   $session_id = $username;
+   session_id($session_id);
 
-    // Increment session ID
-    if (!isset($_SESSION['login_count'])) {
-        $_SESSION['login_count'] = 0;
-    } else {
-        $_SESSION['login_count']++;
-    }
-
-    $session_id = $_SESSION['login_count'];
-    session_id($session_id); // Set session ID
-    setcookie("session_id", $session_id, time() + (86400 * 30), "/");
-
-    // Set session
-    $_SESSION['loggedin'] = true;
-
-    // Set cookie
-    setcookie('login', $username, time() + (86400 * 30), "/"); // Cookie akan bertahan selama 30 hari
-    header('Location: about.php'); // Redirect ke halaman index
-    exit();
+   header("Set-Cookie: PHPSESSID={$session_id}; EXPIRES{$date};");
+   header('Location: about.php'); // Redirect ke halaman index
+   exit();
+ } else {
+   // Jika login gagal
+   echo 'Username atau password salah!';
+   exit();
+ }
 }
+
 ?>
 
 <!DOCTYPE html>

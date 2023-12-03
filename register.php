@@ -2,7 +2,8 @@
 require_once 'config.php'; // Sertakan file konfigurasi database
 
 // Cek jika user sudah login (berdasarkan keberadaan cookie)
-$loggedIn = isset($_COOKIE['login']);
+$loggedIn = isset($_COOKIE['PHPSESSID']);
+
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = mysqli_real_escape_string($koneksi, $_POST['username']);
@@ -20,12 +21,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $insertUser = "INSERT INTO users (username, password) VALUES ('$username', '$hashed_password')";
 
         if (mysqli_query($koneksi, $insertUser)) {
-            // Setelah registrasi berhasil, buat cookie untuk login otomatis
-            $cookieData = serialize(array('username' => $username));
-            setcookie('userLogin', $username, time() + (86400 * 30), "/");
-
             // Redirect ke halaman utama atau dashboard
-            header('Location: index.php');
+            header('Location: login.php');
             exit();
         } else {
             echo "Terjadi kesalahan saat mendaftarkan pengguna.";

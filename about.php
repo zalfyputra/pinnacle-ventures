@@ -1,22 +1,49 @@
 <?php
+// Sertakan file konfigurasi database
+require_once 'config.php';
 // Mulai sesi
-session_name('session_id');
-session_start();
+$loggedIn = isset($_COOKIE['PHPSESSID']);
 
-$loggedIn = isset($_COOKIE['login']);
-// $userData = unserialize($_COOKIE['login']);
-$username = $_COOKIE['login'];
+// Start the session and get the session ID
+session_start();
+$session_id = session_id();
+
+// Retrieve username from session ID
+$queryUser = "SELECT * FROM users WHERE username = '$session_id'";
+$resultUser = mysqli_query($koneksi, $queryUser);
+
+if ($resultUser) {
+    // Check if there is data to fetch
+    if ($user = mysqli_fetch_assoc($resultUser)) {
+        $username = $user['username'];
+    } else {
+        echo "No data found for the session ID: $session_id";
+        header('Location: login.php'); // Redirect ke login.php jika user belum login
+        exit();
+    }
+} else {
+    echo "Query failed: " . mysqli_error($koneksi);
+}
+
 
 if (!$loggedIn) {
-    header('Location: login.php'); // Redirect ke login.php jika user belum login
-    exit();
+   header('Location: login.php'); // Redirect ke login.php jika user belum login
+   exit();
 }
 
 // Logika untuk logout
 if (isset($_GET['action']) && $_GET['action'] == 'logout') {
-    session_destroy(); // Menghapus session
-    header('Location: login.php'); // Redirect ke login.php
-    exit();
+   if (isset($_SERVER['HTTP_COOKIE'])) {
+       $cookies = explode(';', $_SERVER['HTTP_COOKIE']);
+       foreach($cookies as $cookie) {
+           $parts = explode('=', $cookie);
+           $name = trim($parts[0]);
+           setcookie($name, '', time()-1000);
+           setcookie($name, '', time()-1000, '/');
+       }
+   }
+   header('Location: login.php'); // Redirect ke login.php
+   exit();
 }
 ?>
 

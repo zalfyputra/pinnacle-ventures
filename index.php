@@ -1,11 +1,19 @@
 <?php
-$loggedIn = isset($_COOKIE['login']);
+$loggedIn = isset($_COOKIE['PHPSESSID']);
 
 // Logika untuk logout
 if (isset($_GET['action']) && $_GET['action'] == 'logout') {
-    setcookie('login', '', time() - 3600, "/"); // Menghapus cookie
-    header('Location: index.php'); // Redirect kembali ke index.php
-    exit();
+   if (isset($_SERVER['HTTP_COOKIE'])) {
+       $cookies = explode(';', $_SERVER['HTTP_COOKIE']);
+       foreach($cookies as $cookie) {
+           $parts = explode('=', $cookie);
+           $name = trim($parts[0]);
+           setcookie($name, '', time()-1000);
+           setcookie($name, '', time()-1000, '/');
+       }
+   }
+   header('Location: login.php'); // Redirect ke login.php
+   exit();
 }
 ?>
 
