@@ -1,49 +1,31 @@
 <?php
 // Sertakan file konfigurasi database
-require_once 'config.php';
-// Mulai sesi
-$loggedIn = isset($_COOKIE['PHPSESSID']);
-
-// Start the session and get the session ID
+require_once "config.php";
 session_start();
-$session_id = session_id();
 
-// Retrieve username from session ID
-$queryUser = "SELECT * FROM users WHERE username = '$session_id'";
-$resultUser = mysqli_query($koneksi, $queryUser);
+// Cek jika user sudah login (berdasarkan keberadaan cookie)
+$loggedIn = isset($_SESSION["loggedin"]);
 
-if ($resultUser) {
-    // Check if there is data to fetch
-    if ($user = mysqli_fetch_assoc($resultUser)) {
-        $username = $user['username'];
-    } else {
-        echo "No data found for the session ID: $session_id";
-        header('Location: login.php'); // Redirect ke login.php jika user belum login
-        exit();
-    }
-} else {
-    echo "Query failed: " . mysqli_error($koneksi);
+if (!isset($_SESSION["loggedin"])) {
+    header("Location: login.php"); // Redirect kembali ke index.php
+    exit();
 }
 
-
-if (!$loggedIn) {
-   header('Location: login.php'); // Redirect ke login.php jika user belum login
-   exit();
-}
+$username = $_SESSION["username"];
 
 // Logika untuk logout
-if (isset($_GET['action']) && $_GET['action'] == 'logout') {
-   if (isset($_SERVER['HTTP_COOKIE'])) {
-       $cookies = explode(';', $_SERVER['HTTP_COOKIE']);
-       foreach($cookies as $cookie) {
-           $parts = explode('=', $cookie);
-           $name = trim($parts[0]);
-           setcookie($name, '', time()-1000);
-           setcookie($name, '', time()-1000, '/');
-       }
-   }
-   header('Location: login.php'); // Redirect ke login.php
-   exit();
+if (isset($_GET["action"]) && $_GET["action"] == "logout") {
+    if (isset($_SERVER["HTTP_COOKIE"])) {
+        $cookies = explode(";", $_SERVER["HTTP_COOKIE"]);
+        foreach ($cookies as $cookie) {
+            $parts = explode("=", $cookie);
+            $name = trim($parts[0]);
+            setcookie($name, "", time() - 1000);
+            setcookie($name, "", time() - 1000, "/");
+        }
+    }
+    header("Location: login.php"); // Redirect ke login.php
+    exit();
 }
 ?>
 
@@ -108,7 +90,9 @@ if (isset($_GET['action']) && $_GET['action'] == 'logout') {
         </div>
     </nav>
     <div class="container mt-5">
-        <p class="text-center" style="font-size: 45px;">Welcome, <?php echo htmlspecialchars($username); ?>!</p>
+        <p class="text-center" style="font-size: 45px;">Welcome, <?php echo htmlspecialchars(
+            $username
+        ); ?>!</p>
         <div class="w-100 d-flex mt-5">
             <img src="img/arrow.png" alt="" width="250" class="align-self-center mx-auto" />
         </div>

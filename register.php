@@ -1,13 +1,12 @@
 <?php
-require_once 'config.php'; // Sertakan file konfigurasi database
+require_once "config.php"; // Sertakan file konfigurasi database
 
 // Cek jika user sudah login (berdasarkan keberadaan cookie)
-$loggedIn = isset($_COOKIE['PHPSESSID']);
-
+$loggedIn = isset($_COOKIE["PHPSESSID"]);
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = mysqli_real_escape_string($koneksi, $_POST['username']);
-    $password = mysqli_real_escape_string($koneksi, $_POST['password']);
+    $username = mysqli_real_escape_string($koneksi, $_POST["username"]);
+    $password = mysqli_real_escape_string($koneksi, $_POST["password"]);
     $hashed_password = md5($password); // Menggunakan MD5 untuk hashing password
 
     // Cek apakah username sudah ada
@@ -22,7 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (mysqli_query($koneksi, $insertUser)) {
             // Redirect ke halaman utama atau dashboard
-            header('Location: login.php');
+            header("Location: login.php");
             exit();
         } else {
             echo "Terjadi kesalahan saat mendaftarkan pengguna.";
